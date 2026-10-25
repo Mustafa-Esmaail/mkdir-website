@@ -8,16 +8,23 @@ export const contact = {
   github: 'https://github.com/Mustafa-Esmaail',
 };
 
+/** Site base path ("/" locally, "/repo-name/" on GitHub Pages project sites) */
+const BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+/** Prefix a root-relative asset or page path with the base path */
+export const withBase = (path: string) => `${BASE}${path.startsWith('/') ? path : `/${path}`}`;
+
 /** Build a localized URL: href('ar', '/work/') -> '/ar/work/' */
 export function href(lang: Lang, path: string) {
   const clean = path.startsWith('/') ? path : `/${path}`;
-  return lang === 'en' ? clean : `/ar${clean === '/' ? '/' : clean}`;
+  return withBase(lang === 'en' ? clean : `/ar${clean}`);
 }
 
 /** The same page in the other language */
 export function switchLang(lang: Lang, pathname: string) {
-  if (lang === 'ar') return pathname.replace(/^\/ar(\/|$)/, '/') || '/';
-  return pathname === '/' ? '/ar/' : `/ar${pathname}`;
+  const local = pathname.startsWith(BASE) ? pathname.slice(BASE.length) || '/' : pathname;
+  const target = lang === 'ar' ? local.replace(/^\/ar(\/|$)/, '/') : `/ar${local}`;
+  return withBase(target);
 }
 
 export const ui = {
@@ -47,7 +54,7 @@ export const ui = {
     'process.3.cmd': '$ git push', 'process.3.t': 'Build', 'process.3.d': 'Phase-by-phase delivery with a demo at every milestone, so you see real progress.',
     'process.4.cmd': '$ deploy --prod', 'process.4.t': 'Launch & support', 'process.4.d': 'Production release, documentation and handover, then ongoing support as you grow.',
 
-    'why.1.t': 'Senior-led', 'why.1.d': 'You work directly with an engineer with 5+ years in Laravel, MySQL and APIs — no account managers in between.',
+    'why.1.t': 'Senior hands only', 'why.1.d': 'The people you talk to are the people who build your system — no account managers, no handoffs.',
     'why.2.t': 'Built for the region', 'why.2.d': 'Local payment gateways and shipping providers, Arabic and English, and the realities of Saudi and Egyptian markets.',
     'why.3.t': 'You own everything', 'why.3.d': 'Clean, documented code and a full handover. No lock-in.',
 
@@ -66,13 +73,17 @@ export const ui = {
     'work.next': 'Next project',
 
     'about.title': 'About mkdir',
-    'about.p1': 'In the terminal, mkdir is the first command you run to start something new — it creates the folder where everything gets built.',
-    'about.p2': 'That is what we do for businesses: we create the systems and backends they run on. mkdir Solutions is a software engineering studio based in Egypt, working with clients across Egypt, Saudi Arabia and the Gulf.',
-    'about.founder': 'Founder',
+    'about.p1': 'In the terminal, mkdir is the first command of every project. It creates an empty folder: the place where something new gets built.',
+    'about.p2': 'That is the work we do. We are a software engineering studio that designs and builds the systems companies run on, for startups, growing businesses and enterprises across Egypt, Saudi Arabia and the Gulf.',
+    'about.valuesTitle': 'How we think',
+    'about.v1.t': 'Architecture before code', 'about.v1.d': 'Every project starts with a documented plan for the data, the system and the trade-offs. Decisions are written down, not guessed later.',
+    'about.v2.t': 'Small team, senior hands', 'about.v2.d': 'The people you talk to are the people who build your system. No account managers, no handoffs, no surprises.',
+    'about.v3.t': 'Built for this region', 'about.v3.d': 'Arabic and English, local payment gateways and shipping providers, and a real understanding of how business works in Saudi Arabia and Egypt.',
+    'about.v4.t': 'You own all of it', 'about.v4.d': 'Clean code, full documentation and a complete handover. Your system is never locked to us.',
+    'about.founder': 'From the founder',
+    'about.note': 'I named the studio after the first command of every project because that is the moment we care about most: the start, when the right foundations make everything after them easier. Our job is to give your business software that is built well from day one and keeps working as you grow.',
     'about.founderName': 'Mustafa El-Sherief',
-    'about.founderRole': 'Founder & Senior Backend Engineer',
-    'about.founderBio': '5+ years building ERP and CRM systems, multi-warehouse inventory, POS integrations, e-commerce with regional payment and shipping APIs, and SaaS platforms. Specialised in Laravel, MySQL and RESTful API design.',
-    'about.stack': 'Core stack',
+    'about.founderRole': 'Founder, mkdir Solutions',
 
     'contact.title': 'Start a project',
     'contact.lead': 'Tell us what you are building. We reply within one business day with next steps and an honest view of scope.',
@@ -118,7 +129,7 @@ export const ui = {
     'process.3.cmd': '$ git push', 'process.3.t': 'التطوير', 'process.3.d': 'تسليم على مراحل مع عرض عملي في كل مرحلة، لترى التقدم الحقيقي بنفسك.',
     'process.4.cmd': '$ deploy --prod', 'process.4.t': 'الإطلاق والدعم', 'process.4.d': 'إطلاق على بيئة الإنتاج مع التوثيق والتسليم، ثم دعم مستمر مع نمو أعمالك.',
 
-    'why.1.t': 'خبرة مباشرة', 'why.1.d': 'تتعامل مباشرة مع مهندس بخبرة تزيد عن 5 سنوات في Laravel و MySQL والـ API، دون وسطاء.',
+    'why.1.t': 'خبرة مباشرة', 'why.1.d': 'من تتحدث معهم هم من يبنون نظامك، بلا وسطاء وبلا تسليم بين فرق.',
     'why.2.t': 'مصمم للمنطقة', 'why.2.d': 'بوابات دفع وشركات شحن محلية، عربي وإنجليزي، وفهم حقيقي للسوقين السعودي والمصري.',
     'why.3.t': 'كل شيء ملكك', 'why.3.d': 'كود نظيف وموثق وتسليم كامل، بدون أي ارتباط إجباري.',
 
@@ -137,13 +148,17 @@ export const ui = {
     'work.next': 'المشروع التالي',
 
     'about.title': 'عن mkdir',
-    'about.p1': 'في الـ Terminal، الأمر mkdir هو أول أمر تكتبه لتبدأ شيئاً جديداً: ينشئ المجلد الذي يُبنى فيه كل شيء.',
-    'about.p2': 'وهذا ما نفعله للشركات: نبني الأنظمة التي تعمل عليها. mkdir Solutions استوديو هندسة برمجيات مقره مصر، ويعمل مع عملاء في مصر والسعودية والخليج.',
-    'about.founder': 'المؤسس',
+    'about.p1': 'في الـ Terminal، الأمر mkdir هو أول أمر في أي مشروع. ينشئ مجلداً فارغاً: المكان الذي يُبنى فيه كل شيء جديد.',
+    'about.p2': 'وهذا هو عملنا. نحن استوديو هندسة برمجيات يصمم ويبني الأنظمة التي تعمل عليها الشركات، للشركات الناشئة والنامية والمؤسسات الكبرى في مصر والسعودية والخليج.',
+    'about.valuesTitle': 'كيف نفكر',
+    'about.v1.t': 'المعمارية قبل الكود', 'about.v1.d': 'كل مشروع يبدأ بخطة موثقة للبيانات والنظام والقرارات التقنية. القرارات تُكتب من البداية، لا تُخمَّن لاحقاً.',
+    'about.v2.t': 'فريق صغير وخبرة حقيقية', 'about.v2.d': 'من تتحدث معهم هم من يبنون نظامك. لا وسطاء ولا تسليم بين فرق ولا مفاجآت.',
+    'about.v3.t': 'مصمم لهذه المنطقة', 'about.v3.d': 'عربي وإنجليزي، بوابات دفع وشركات شحن محلية، وفهم حقيقي لطريقة العمل في السعودية ومصر.',
+    'about.v4.t': 'كل شيء ملكك', 'about.v4.d': 'كود نظيف وتوثيق كامل وتسليم شامل. نظامك لا يرتبط بنا أبداً.',
+    'about.founder': 'كلمة المؤسس',
+    'about.note': 'سمّيت الاستوديو باسم أول أمر في أي مشروع لأن هذه هي اللحظة التي نهتم بها أكثر: البداية، حين تجعل الأسس الصحيحة كل ما بعدها أسهل. مهمتنا أن نقدم لشركتك برمجيات مبنية بشكل صحيح من اليوم الأول وتستمر في العمل مع نموك.',
     'about.founderName': 'مصطفى الشريف',
-    'about.founderRole': 'المؤسس ومهندس Backend أول',
-    'about.founderBio': 'أكثر من 5 سنوات في بناء أنظمة ERP و CRM، والمخزون متعدد المستودعات، وربط نقاط البيع، والمتاجر الإلكترونية مع بوابات الدفع والشحن المحلية، ومنصات SaaS. متخصص في Laravel و MySQL وتصميم واجهات REST.',
-    'about.stack': 'التقنيات الأساسية',
+    'about.founderRole': 'المؤسس، mkdir Solutions',
 
     'contact.title': 'ابدأ مشروعك',
     'contact.lead': 'أخبرنا بما تريد بناءه، وسنرد خلال يوم عمل واحد بالخطوات التالية ورؤية واضحة للنطاق.',

@@ -1,35 +1,49 @@
 ---
 import Shell from '../layouts/Shell.astro';
 import ContactBlock from '../components/ContactBlock.astro';
+import SectionHead from '../components/SectionHead.astro';
 import { contact, t, withBase, type Lang } from '../i18n/ui';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const _ = t(lang);
-const stack = ['Laravel', 'PHP', 'MySQL', 'REST APIs', 'Livewire', 'Filament', 'Tailwind CSS', 'Next.js'];
+const values = [1, 2, 3, 4] as const;
 ---
 <Shell lang={lang} file="about.md" title={_('about.title')}>
   <h1 class="font-display text-[clamp(36px,4.6vw,60px)] leading-[1.06] font-semibold tracking-display" dir="auto">{_('about.title')}</h1>
-  <div class="mt-6 mb-14 max-w-[680px] space-y-5 text-lg leading-relaxed text-body">
+  <div class="mt-6 mb-16 max-w-[680px] space-y-5 text-lg leading-relaxed text-body">
     <p>{_('about.p1')}</p>
     <p>{_('about.p2')}</p>
   </div>
 
-  <section class="mb-16 grid gap-8 rounded-xl border border-line p-6 sm:p-8 md:grid-cols-[220px_minmax(0,1fr)] md:items-start">
-    <img src={withBase('/mustafa.webp')} alt={_('about.founderName')} width="220" height="220" loading="lazy" class="aspect-square w-40 rounded-xl border border-line object-cover md:w-full" />
-    <div>
-      <p class="mb-2 font-mono text-[13px] text-accent"><span dir="ltr">## founder_bio.md</span></p>
-      <h2 class="font-display text-2xl font-semibold tracking-tight">{_('about.founderName')}</h2>
-      <p class="mb-4 text-muted">{_('about.founderRole')}</p>
-      <p class="mb-6 leading-relaxed text-body">{_('about.founderBio')}</p>
-      <p class="mb-2 font-mono text-xs text-muted uppercase">{_('about.stack')}</p>
-      <ul class="mb-6 flex flex-wrap gap-2">
-        {stack.map((s) => <li dir="ltr" class="rounded-md border border-line-strong px-2.5 py-1 font-mono text-xs text-body">{s}</li>)}
-      </ul>
-      <div class="flex flex-wrap gap-4 text-sm font-medium">
-        <a href={contact.linkedin} target="_blank" rel="noopener" class="text-accent hover:underline">LinkedIn ↗</a>
-        <a href={contact.github} target="_blank" rel="noopener" class="text-accent hover:underline">GitHub ↗</a>
-      </div>
+  <section class="mb-16">
+    <SectionHead title={_('about.valuesTitle')} meta="principles.md" />
+    <div class="grid gap-3.5 sm:grid-cols-2">
+      {values.map((n) => (
+        <div class="rounded-xl border border-line p-6">
+          <p class="mb-3 font-mono text-[13px] text-accent"><span dir="ltr">0{n}</span></p>
+          <h3 class="mb-2 font-display text-xl font-semibold tracking-tight">{_(`about.v${n}.t`)}</h3>
+          <p class="text-[15px] leading-relaxed text-muted">{_(`about.v${n}.d`)}</p>
+        </div>
+      ))}
     </div>
   </section>
+
+  <section class="mb-16">
+    <SectionHead title={_('about.founder')} meta="note.md" />
+    <figure class="rounded-xl bg-side p-6 sm:p-10">
+      <blockquote class="max-w-[760px] font-display text-[clamp(19px,2vw,24px)] leading-relaxed font-medium text-ink">
+        {lang === 'ar' ? `«${_('about.note')}»` : `“${_('about.note')}”`}
+      </blockquote>
+      <figcaption class="mt-8 flex items-center gap-4">
+        <img src={withBase('/mustafa.webp')} alt="" width="56" height="56" loading="lazy" class="size-14 rounded-full border border-line object-cover" />
+        <div>
+          <p class="font-semibold">{_('about.founderName')}</p>
+          <p class="text-sm text-muted">{_('about.founderRole')}</p>
+        </div>
+        <a href={contact.linkedin} target="_blank" rel="noopener" class="ms-auto text-sm font-medium text-accent hover:underline">LinkedIn ↗</a>
+      </figcaption>
+    </figure>
+  </section>
+
   <ContactBlock lang={lang} />
 </Shell>

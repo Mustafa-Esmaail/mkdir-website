@@ -1,0 +1,114 @@
+---
+/**
+ * Terminal-style page loader.
+ * - On every page change it "types" `cd` into the target file, then the new page swaps in.
+ * Kept short on purpose (~0.4s) so it never feels slow. Respects reduced-motion.
+ */
+---
+<div id="term-loader" transition:persist="term-loader" aria-hidden="true" data-state="hidden">
+  <div class="tl-card">
+    <div class="tl-bar"><i></i><i></i><i></i><span>~/mkdir</span></div>
+    <div class="tl-body" dir="ltr">
+      <div id="tl-lines"></div>
+      <div class="tl-line"><span class="tl-p">$</span> <span id="tl-cmd"></span><span class="tl-caret"></span></div>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  #term-loader {
+    position: fixed; inset: 0; z-index: 100;
+    display: grid; place-items: center;
+    background: color-mix(in srgb, var(--color-page) 72%, transparent);
+    backdrop-filter: blur(3px);
+    opacity: 0; visibility: hidden;
+    transition: opacity .18s ease, visibility 0s linear .18s;
+  }
+  #term-loader[data-state="visible"] { opacity: 1; visibility: visible; transition: opacity .12s ease; }
+  .tl-card {
+    width: min(420px, calc(100vw - 32px));
+    background: var(--color-term); color: var(--color-term-text);
+    border-radius: 12px; overflow: hidden;
+    box-shadow: 0 24px 60px -20px rgba(15, 23, 42, .45);
+    transform: translateY(6px) scale(.98); transition: transform .18s ease;
+  }
+  #term-loader[data-state="visible"] .tl-card { transform: none; }
+  .tl-bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .tl-bar i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.18); }
+  .tl-bar span { margin-inline-start: 8px; font: 12px var(--font-mono); color: var(--color-term-dim); }
+  .tl-body { padding: 16px 18px 18px; font: 13.5px/1.9 var(--font-mono); min-height: 64px; }
+  .tl-line { white-space: pre-wrap; word-break: break-all; }
+  .tl-p { color: var(--color-term-blue); }
+  .tl-ok { color: var(--color-term-green); }
+  .tl-dim { color: var(--color-term-dim); }
+  .tl-caret { display: inline-block; width: .55em; height: 1.05em; vertical-align: -.15em; margin-inline-start: 2px; background: var(--color-term-blue); animation: blink 1s steps(1) infinite; }
+</style>
+
+<script>
+  const BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
+  const reduce = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  const el = () => document.getElementById('term-loader');
+  const cmdEl = () => document.getElementById('tl-cmd');
+  const linesEl = () => document.getElementById('tl-lines');
+
+  /** "/ar/work/xclinics/" -> "work/xclinics.md" */
+  function fileFor(url: URL) {
+    let p = url.pathname;
+    if (BASE && p.startsWith(BASE)) p = p.slice(BASE.length);
+    p = p.replace(/^\/ar(\/|$)/, '/').replace(/^\/|\/$/g, '');
+    if (!p) return 'index.md';
+    if (p === 'about') return 'about.md';
+    if (p === 'contact') return 'contact.sh';
+    if (p === 'services' || p === 'work') return `${p}/`;
+    if (p.startsWith('work/')) return `${p}.md`;
+    return p;
+  }
+
+  let typing = 0;
+  async function type(text: string, speed = 14) {
+    const id = ++typing;
+    const out = cmdEl();
+    if (!out) return;
+    out.textContent = '';
+    for (const ch of text) {
+      if (id !== typing) return;
+      out.textContent += ch;
+      await wait(speed);
+    }
+  }
+
+  function line(html: string) {
+    const d = document.createElement('div');
+    d.className = 'tl-line';
+    d.innerHTML = html;
+    linesEl()?.appendChild(d);
+  }
+
+  function show() { el()?.setAttribute('data-state', 'visible'); }
+  function hide() {
+    el()?.setAttribute('data-state', 'hidden');
+    typing++;
+    setTimeout(() => { if (linesEl()) linesEl()!.innerHTML = ''; if (cmdEl()) cmdEl()!.textContent = ''; }, 200);
+  }
+
+  // Page-to-page navigation
+  document.addEventListener('astro:before-preparation', (e) => {
+    if (reduce()) return;
+    const target = fileFor(e.to);
+    if (linesEl()) linesEl()!.innerHTML = '';
+    show();
+    const typed = type(`cd ~/mkdir/${target}`);
+    const original = e.loader;
+    e.loader = async () => {
+      await Promise.all([original(), typed, wait(380)]);
+      line(`<span class="tl-p">$</span> cd ~/mkdir/${target}`);
+      if (cmdEl()) cmdEl()!.textContent = '';
+      line('<span class="tl-ok">✓ loaded</span>');
+      await wait(120);
+    };
+  });
+  document.addEventListener('astro:after-swap', hide);
+
+</script>
