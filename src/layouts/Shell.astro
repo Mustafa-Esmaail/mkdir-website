@@ -1,0 +1,108 @@
+---
+import '../styles/global.css';
+import Logo from '../components/Logo.astro';
+import FileTree from '../components/FileTree.astro';
+import { href, switchLang, t, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  /** current file in the explorer, e.g. "index.md", "work/xclinics.md" */
+  file: string;
+  title?: string;
+  description?: string;
+}
+const { lang, file, title, description } = Astro.props;
+const _ = t(lang);
+const dir = lang === 'ar' ? 'rtl' : 'ltr';
+const pageTitle = title ? `${title} · mkdir Solutions` : _('meta.title');
+const desc = description ?? _('meta.description');
+const path = Astro.url.pathname;
+const other = switchLang(lang, path);
+const site = Astro.site ?? new URL('https://mkdir.solutions');
+const enUrl = new URL(lang === 'en' ? path : other, site).href;
+const arUrl = new URL(lang === 'ar' ? path : other, site).href;
+const crumbs = file.split('/').filter(Boolean);
+---
+<!doctype html>
+<html lang={lang} dir={dir}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={new URL(path, site).href} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="ar" href={arUrl} />
+    <link rel="alternate" hreflang="x-default" href={enUrl} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#0F172A" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:locale" content={lang === 'ar' ? 'ar_SA' : 'en_US'} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href={lang === 'ar'
+        ? 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap'
+        : 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap'}
+    />
+  </head>
+  <body class="min-h-screen p-0 sm:p-4 lg:p-7">
+    <a href="#main" class="absolute -top-20 start-4 z-50 rounded-lg bg-accent px-4 py-2 text-white focus:top-4">{_('skip')}</a>
+
+    <div class="mx-auto flex min-h-[calc(100vh-3.5rem)] max-w-[1360px] flex-col overflow-hidden border-line bg-window sm:rounded-2xl sm:border">
+      <!-- top bar -->
+      <header class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-5">
+        <a href={href(lang, '/')} class="flex items-center gap-2.5" aria-label="mkdir Solutions">
+          <Logo size={28} />
+          <span class="font-display text-[19px] font-semibold tracking-tight" dir="ltr">mkdir</span>
+          <span class="hidden font-mono text-xs text-muted sm:inline" dir="ltr">/ solutions</span>
+        </a>
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <a href={other} hreflang={lang === 'en' ? 'ar' : 'en'} class="rounded-lg px-3 py-2.5 text-sm text-body hover:bg-side hover:text-ink">{_('nav.otherLang')}</a>
+          <a href={href(lang, '/contact/')} class="rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white hover:bg-accent-hover">{_('nav.start')}</a>
+        </div>
+      </header>
+
+      <!-- mobile explorer -->
+      <details class="group border-b border-line bg-side lg:hidden">
+        <summary class="flex cursor-pointer items-center justify-between px-4 py-3 font-mono text-[13px] text-body">
+          <span dir="ltr">~/mkdir/{file}</span>
+          <span class="flex items-center gap-2">{_('nav.openFiles')}
+            <svg class="transition-transform group-open:rotate-180" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+          </span>
+        </summary>
+        <div class="px-2 pb-4"><FileTree lang={lang} current={file} /></div>
+      </details>
+
+      <div class="flex flex-1">
+        <aside class="hidden w-[264px] shrink-0 border-e border-line bg-side px-3 py-5 lg:block">
+          <FileTree lang={lang} current={file} />
+        </aside>
+
+        <main id="main" class="min-w-0 flex-1">
+          <div class="flex overflow-x-auto border-b border-line font-mono text-[13px]" dir="ltr">
+            {file !== 'index.md' && (
+              <a href={href(lang, '/')} class="whitespace-nowrap border-e border-line px-4 py-3 text-muted hover:text-ink">index.md</a>
+            )}
+            <span class="whitespace-nowrap border-e border-b-2 border-line border-b-accent px-4 py-3 text-ink">{file.endsWith('/') ? `${file}README.md` : file}</span>
+          </div>
+          <div class="px-5 py-8 sm:px-10 sm:py-12 lg:px-16 lg:py-14">
+            <p class="mb-6 font-mono text-[13px] text-muted"><span dir="ltr">
+              <a href={href(lang, '/')} class="hover:text-accent">~/mkdir</a>
+              {crumbs.map((c) => <span> / {c}</span>)}
+            </span></p>
+            <slot />
+          </div>
+        </main>
+      </div>
+
+      <footer class="flex flex-wrap items-center justify-between gap-2 bg-accent px-4 py-2 font-mono text-xs text-white sm:px-5">
+        <span dir="ltr">main · © {new Date().getFullYear()} {_('footer.rights')}</span>
+        <span>{_('footer.where')} · EN / AR</span>
+      </footer>
+    </div>
+  </body>
+</html>

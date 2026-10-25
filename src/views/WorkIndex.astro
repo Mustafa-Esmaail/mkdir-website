@@ -1,0 +1,19 @@
+---
+import Shell from '../layouts/Shell.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ContactBlock from '../components/ContactBlock.astro';
+import { t, type Lang } from '../i18n/ui';
+import { projects } from '../data/projects';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const _ = t(lang);
+---
+<Shell lang={lang} file="work/" title={_('work.title')}>
+  <h1 class="font-display text-[clamp(36px,4.6vw,60px)] leading-[1.06] font-semibold tracking-display">{_('work.title')}</h1>
+  <p class="mt-5 mb-3 max-w-[620px] text-lg leading-relaxed text-body">{_('work.lead')}</p>
+  <p class="mb-8 font-mono text-[13px] text-muted"><span dir="ltr">ls -la · {projects.length} {_('work.items')}</span></p>
+  <div class="mb-16 grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-3.5">
+    {projects.map((p) => <ProjectCard lang={lang} project={p} />)}
+  </div>
+  <ContactBlock lang={lang} />
+</Shell>

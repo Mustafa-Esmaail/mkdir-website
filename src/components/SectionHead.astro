@@ -1,0 +1,8 @@
+---
+interface Props { title: string; meta?: string; id?: string }
+const { title, meta, id } = Astro.props;
+---
+<div id={id} class="mb-5 flex flex-wrap items-baseline justify-between gap-3 scroll-mt-6">
+  <h2 class="font-display text-[28px] font-semibold tracking-tight" dir="auto">{title}</h2>
+  {meta && <span class="font-mono text-[13px] text-muted">{meta}</span>}
+</div>

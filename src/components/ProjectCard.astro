@@ -1,0 +1,12 @@
+---
+import FolderIcon from './FolderIcon.astro';
+import { href, type Lang } from '../i18n/ui';
+import { regionLabel, type Project } from '../data/projects';
+interface Props { lang: Lang; project: Project }
+const { lang, project: p } = Astro.props;
+---
+<a href={href(lang, `/work/${p.slug}/`)} class="group flex flex-col gap-3 rounded-xl border border-line p-5 transition-colors hover:border-accent/50 hover:bg-side">
+  <span class="text-accent"><FolderIcon /></span>
+  <span class="font-display text-xl font-semibold tracking-tight break-all" dir="ltr">{p.slug}/</span>
+  <span class="text-sm leading-relaxed text-muted">{p.sector[lang]} · {regionLabel[p.region][lang]}</span>
+</a>

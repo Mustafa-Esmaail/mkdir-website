@@ -1,0 +1,44 @@
+---
+import { href, t, type Lang } from '../i18n/ui';
+import { services } from '../data/services';
+import { projects } from '../data/projects';
+
+interface Props { lang: Lang; current: string }
+const { lang, current } = Astro.props;
+const _ = t(lang);
+const inWork = current.startsWith('work/');
+const inServices = current.startsWith('services/');
+
+const base = 'block rounded-md py-1.5 pe-2 text-[13.5px] text-body hover:bg-line/60 hover:text-ink';
+const active = 'bg-accent-soft text-accent-ink font-medium hover:bg-accent-soft hover:text-accent-ink';
+const is = (f: string) => current === f;
+---
+<nav aria-label={_('nav.explorer')} class="font-mono" dir="ltr">
+  <p class="mb-2 ps-2.5 text-[11px] tracking-[0.08em] text-muted uppercase">{_('nav.explorer')}</p>
+  <ul class="space-y-0.5">
+    <li><a href={href(lang, '/')} class:list={[base, 'ps-2.5 text-ink']}>▾ ~/mkdir</a></li>
+    <li><a href={href(lang, '/')} class:list={[base, 'ps-7', is('index.md') && active]} aria-current={is('index.md') ? 'page' : undefined}>index.md</a></li>
+    <li>
+      <a href={href(lang, '/services/')} class:list={[base, 'ps-7', is('services/') && active]} aria-current={is('services/') ? 'page' : undefined}>{inServices ? '▾' : '▸'} services/</a>
+      {inServices && (
+        <ul class="space-y-0.5">
+          {services.map((s) => (
+            <li><a href={href(lang, `/services/#${s.id}`)} class:list={[base, 'ps-12 py-1 text-muted']}>{s.file}</a></li>
+          ))}
+        </ul>
+      )}
+    </li>
+    <li>
+      <a href={href(lang, '/work/')} class:list={[base, 'ps-7', is('work/') && active]} aria-current={is('work/') ? 'page' : undefined}>{inWork ? '▾' : '▸'} work/</a>
+      {inWork && (
+        <ul class="space-y-0.5">
+          {projects.map((p) => (
+            <li><a href={href(lang, `/work/${p.slug}/`)} class:list={[base, 'ps-12 py-1', is(`work/${p.slug}.md`) ? active : 'text-muted']} aria-current={is(`work/${p.slug}.md`) ? 'page' : undefined}>{p.slug}.md</a></li>
+          ))}
+        </ul>
+      )}
+    </li>
+    <li><a href={href(lang, '/about/')} class:list={[base, 'ps-7', is('about.md') && active]} aria-current={is('about.md') ? 'page' : undefined}>about.md</a></li>
+    <li><a href={href(lang, '/contact/')} class:list={[base, 'ps-7', is('contact.sh') && active]} aria-current={is('contact.sh') ? 'page' : undefined}>contact.sh</a></li>
+  </ul>
+</nav>

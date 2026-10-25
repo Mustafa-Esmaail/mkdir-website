@@ -1,0 +1,72 @@
+---
+import Shell from '../layouts/Shell.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ContactBlock from '../components/ContactBlock.astro';
+import SectionHead from '../components/SectionHead.astro';
+import { href, t, type Lang } from '../i18n/ui';
+import { services } from '../data/services';
+import { projects } from '../data/projects';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const _ = t(lang);
+const featured = projects.filter((p) => p.featured);
+const steps = [1, 2, 3, 4] as const;
+---
+<Shell lang={lang} file="index.md">
+  <h1 class="max-w-[900px] font-display text-[clamp(38px,5.6vw,76px)] leading-[1.04] font-semibold tracking-display">{_('home.h1')}</h1>
+  <p class="mt-7 mb-9 max-w-[620px] text-lg leading-relaxed text-body">{_('home.lead')}</p>
+  <div class="mb-16 flex flex-wrap gap-3">
+    <a href={href(lang, '/contact/')} class="rounded-lg bg-ink px-5 py-3.5 font-mono text-[15px] font-medium text-white hover:bg-accent" dir="ltr">$ mkdir my-project</a>
+    <a href={href(lang, '/work/')} class="rounded-lg border border-line-strong px-5 py-3.5 text-[15px] font-medium hover:border-ink">{_('home.ctaWork')}</a>
+  </div>
+
+  <section class="mb-16" aria-labelledby="h-services">
+    <SectionHead title={_('home.services')} meta={_('home.servicesMeta')} />
+    <ul class="divide-y divide-line border-y border-line">
+      {services.map((s, i) => (
+        <li>
+          <a href={href(lang, `/services/#${s.id}`)} class="group grid gap-x-6 gap-y-1 py-4 sm:grid-cols-[48px_minmax(0,1fr)_minmax(0,1.4fr)] sm:items-baseline">
+            <span class="font-mono text-sm text-accent" dir="ltr">0{i + 1}</span>
+            <span class="font-display text-xl font-medium tracking-tight group-hover:text-accent">{s.title[lang]}</span>
+            <span class="text-[15px] leading-relaxed text-muted">{s.summary[lang]}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="mb-16">
+    <SectionHead title={_('home.work')} meta={`ls -la · ${featured.length} / ${projects.length} ${_('work.items')}`} />
+    <div class="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-3.5">
+      {featured.map((p) => <ProjectCard lang={lang} project={p} />)}
+    </div>
+    <a href={href(lang, '/work/')} class="mt-5 inline-block font-mono text-sm text-accent hover:underline">{_('home.allWork')} {lang === 'ar' ? '←' : '→'}</a>
+  </section>
+
+  <section class="mb-16">
+    <SectionHead title={_('home.process')} meta={_('home.processMeta')} />
+    <ol class="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+      {steps.map((n) => (
+        <li class="border-t-2 border-line pt-5 transition-colors hover:border-accent">
+          <code class="mb-3 block font-mono text-[13px] text-accent" dir="ltr">{_(`process.${n}.cmd`)}</code>
+          <h3 class="mb-1.5 font-display text-lg font-semibold">{_(`process.${n}.t`)}</h3>
+          <p class="text-[15px] leading-relaxed text-muted">{_(`process.${n}.d`)}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="mb-16">
+    <SectionHead title={_('home.why')} />
+    <div class="grid gap-3.5 md:grid-cols-3">
+      {([1, 2, 3] as const).map((n) => (
+        <div class="rounded-xl border border-line bg-side p-6">
+          <h3 class="mb-2 font-semibold">{_(`why.${n}.t`)}</h3>
+          <p class="text-[15px] leading-relaxed text-muted">{_(`why.${n}.d`)}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <ContactBlock lang={lang} />
+</Shell>

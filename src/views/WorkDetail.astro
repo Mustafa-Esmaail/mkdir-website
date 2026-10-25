@@ -1,0 +1,42 @@
+---
+import Shell from '../layouts/Shell.astro';
+import ContactBlock from '../components/ContactBlock.astro';
+import { href, t, type Lang } from '../i18n/ui';
+import { projects, regionLabel, type Project } from '../data/projects';
+interface Props { lang: Lang; project: Project }
+const { lang, project: p } = Astro.props;
+const _ = t(lang);
+const idx = projects.findIndex((x) => x.slug === p.slug);
+const next = projects[(idx + 1) % projects.length];
+---
+<Shell lang={lang} file={`work/${p.slug}.md`} title={p.name} description={p.summary[lang]}>
+  <a href={href(lang, '/work/')} class="mb-6 inline-block font-mono text-[13px] text-accent hover:underline" dir="ltr">$ {_('work.back')}</a>
+  <h1 class="font-display text-[clamp(36px,4.6vw,60px)] leading-[1.06] font-semibold tracking-display" dir="ltr" style={lang === 'ar' ? 'text-align:right' : undefined}>{p.name}</h1>
+  <dl class="mt-8 mb-12 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line md:grid-cols-3">
+    <div class="bg-window p-5"><dt class="mb-1 font-mono text-xs text-muted uppercase">{_('work.sector')}</dt><dd class="font-medium">{p.sector[lang]}</dd></div>
+    <div class="bg-window p-5"><dt class="mb-1 font-mono text-xs text-muted uppercase">{_('work.market')}</dt><dd class="font-medium">{regionLabel[p.region][lang]}</dd></div>
+    <div class="col-span-2 bg-window p-5 md:col-span-1"><dt class="mb-1 font-mono text-xs text-muted uppercase">{_('work.stack')}</dt><dd class="font-medium" dir="ltr" style={lang === 'ar' ? 'text-align:right' : undefined}>{p.stack.join(' · ')}</dd></div>
+  </dl>
+  <div class="mb-16 grid gap-10 md:grid-cols-2">
+    <section>
+      <h2 class="mb-3 font-mono text-sm text-accent"><span dir="ltr">## {_('work.overview')}</span></h2>
+      <p class="text-lg leading-relaxed text-body">{p.summary[lang]}</p>
+    </section>
+    <section>
+      <h2 class="mb-3 font-mono text-sm text-accent"><span dir="ltr">## {_('work.built')}</span></h2>
+      <ul class="space-y-3">
+        {p.highlights[lang].map((h) => (
+          <li class="flex gap-3">
+            <svg class="mt-1 shrink-0 text-accent" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12l5 5L20 7" /></svg>
+            <span class="leading-relaxed">{h}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </div>
+  <a href={href(lang, `/work/${next.slug}/`)} class="mb-10 flex items-center justify-between gap-4 rounded-xl border border-line p-5 hover:border-accent/50 hover:bg-side">
+    <span class="text-sm text-muted">{_('work.next')}</span>
+    <span class="font-display text-lg font-semibold" dir="ltr">{next.slug}/ {lang === 'ar' ? '' : '→'}</span>
+  </a>
+  <ContactBlock lang={lang} />
+</Shell>

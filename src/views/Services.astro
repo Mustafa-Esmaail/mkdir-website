@@ -1,0 +1,35 @@
+---
+import Shell from '../layouts/Shell.astro';
+import ContactBlock from '../components/ContactBlock.astro';
+import { t, type Lang } from '../i18n/ui';
+import { services } from '../data/services';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const _ = t(lang);
+---
+<Shell lang={lang} file="services/" title={_('services.title')}>
+  <h1 class="font-display text-[clamp(36px,4.6vw,60px)] leading-[1.06] font-semibold tracking-display">{_('services.title')}</h1>
+  <p class="mt-5 mb-12 max-w-[620px] text-lg leading-relaxed text-body">{_('services.lead')}</p>
+  <div class="mb-16 space-y-4">
+    {services.map((s, i) => (
+      <article id={s.id} class="scroll-mt-6 rounded-xl border border-line p-6 sm:p-8">
+        <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <div>
+            <p class="mb-3 font-mono text-[13px] text-accent"><span dir="ltr">0{i + 1} · {s.file}</span></p>
+            <h2 class="mb-3 font-display text-2xl font-semibold tracking-tight">{s.title[lang]}</h2>
+            <p class="leading-relaxed text-body">{s.summary[lang]}</p>
+          </div>
+          <ul class="space-y-2.5 self-center">
+            {s.points[lang].map((pt) => (
+              <li class="flex gap-3 text-[15px]">
+                <svg class="mt-1 shrink-0 text-accent" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12l5 5L20 7" /></svg>
+                <span>{pt}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </article>
+    ))}
+  </div>
+  <ContactBlock lang={lang} />
+</Shell>

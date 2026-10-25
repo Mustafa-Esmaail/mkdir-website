@@ -1,0 +1,35 @@
+---
+import Shell from '../layouts/Shell.astro';
+import ContactBlock from '../components/ContactBlock.astro';
+import { contact, t, withBase, type Lang } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const _ = t(lang);
+const stack = ['Laravel', 'PHP', 'MySQL', 'REST APIs', 'Livewire', 'Filament', 'Tailwind CSS', 'Next.js'];
+---
+<Shell lang={lang} file="about.md" title={_('about.title')}>
+  <h1 class="font-display text-[clamp(36px,4.6vw,60px)] leading-[1.06] font-semibold tracking-display" dir="auto">{_('about.title')}</h1>
+  <div class="mt-6 mb-14 max-w-[680px] space-y-5 text-lg leading-relaxed text-body">
+    <p>{_('about.p1')}</p>
+    <p>{_('about.p2')}</p>
+  </div>
+
+  <section class="mb-16 grid gap-8 rounded-xl border border-line p-6 sm:p-8 md:grid-cols-[220px_minmax(0,1fr)] md:items-start">
+    <img src={withBase('/mustafa.webp')} alt={_('about.founderName')} width="220" height="220" loading="lazy" class="aspect-square w-40 rounded-xl border border-line object-cover md:w-full" />
+    <div>
+      <p class="mb-2 font-mono text-[13px] text-accent"><span dir="ltr">## founder_bio.md</span></p>
+      <h2 class="font-display text-2xl font-semibold tracking-tight">{_('about.founderName')}</h2>
+      <p class="mb-4 text-muted">{_('about.founderRole')}</p>
+      <p class="mb-6 leading-relaxed text-body">{_('about.founderBio')}</p>
+      <p class="mb-2 font-mono text-xs text-muted uppercase">{_('about.stack')}</p>
+      <ul class="mb-6 flex flex-wrap gap-2">
+        {stack.map((s) => <li dir="ltr" class="rounded-md border border-line-strong px-2.5 py-1 font-mono text-xs text-body">{s}</li>)}
+      </ul>
+      <div class="flex flex-wrap gap-4 text-sm font-medium">
+        <a href={contact.linkedin} target="_blank" rel="noopener" class="text-accent hover:underline">LinkedIn ↗</a>
+        <a href={contact.github} target="_blank" rel="noopener" class="text-accent hover:underline">GitHub ↗</a>
+      </div>
+    </div>
+  </section>
+  <ContactBlock lang={lang} />
+</Shell>

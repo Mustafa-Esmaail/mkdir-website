@@ -1,0 +1,14 @@
+---
+import { href, t, type Lang } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const _ = t(lang);
+---
+<div class="flex flex-wrap items-center justify-between gap-6 rounded-xl bg-term p-6 text-term-text sm:p-10">
+  <div class="font-mono text-[15px] leading-8">
+    <div class="text-term-dim" dir="ltr">{_('contact.cmd1')}</div>
+    <div dir="ltr"><span class="text-term-blue">$</span> {_('contact.cmd2')}<span class="caret text-term-blue"></span></div>
+    <div class="text-term-green">{_('contact.cmd3')}</div>
+  </div>
+  <a href={href(lang, '/contact/')} class="rounded-lg bg-white px-5 py-3.5 text-[15px] font-medium text-ink hover:bg-accent-soft">{_('contact.run')} {lang === 'ar' ? '←' : '→'}</a>
+</div>

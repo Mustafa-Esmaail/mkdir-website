@@ -1,0 +1,68 @@
+---
+import Shell from '../layouts/Shell.astro';
+import { contact, t, type Lang } from '../i18n/ui';
+import { services } from '../data/services';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const _ = t(lang);
+const field = 'w-full rounded-lg border border-line-strong bg-window px-3.5 py-3 text-[15px] text-ink placeholder:text-muted focus:border-accent focus:outline-none';
+---
+<Shell lang={lang} file="contact.sh" title={_('contact.title')}>
+  <h1 class="font-display text-[clamp(36px,4.6vw,60px)] leading-[1.06] font-semibold tracking-display">{_('contact.title')}</h1>
+  <p class="mt-5 mb-10 max-w-[620px] text-lg leading-relaxed text-body">{_('contact.lead')}</p>
+
+  <div class="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+    <!--
+      This form opens the visitor's email app with the message pre-filled, so it works with no backend.
+      To receive submissions directly, create a free form at formspree.io or web3forms.com,
+      set the form's action to that endpoint, and remove the script below.
+    -->
+    <form id="contact-form" class="space-y-4 rounded-xl border border-line p-6 sm:p-8" novalidate data-email={contact.email} data-err={_('contact.required')}>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div><label for="name" class="mb-1.5 block text-sm font-medium">{_('contact.name')}</label><input id="name" name="name" required autocomplete="name" class={field} /></div>
+        <div><label for="email" class="mb-1.5 block text-sm font-medium">{_('contact.email')}</label><input id="email" name="email" type="email" required autocomplete="email" class={field} dir="ltr" /></div>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div><label for="company" class="mb-1.5 block text-sm font-medium">{_('contact.company')}</label><input id="company" name="company" autocomplete="organization" class={field} /></div>
+        <div><label for="type" class="mb-1.5 block text-sm font-medium">{_('contact.type')}</label>
+          <select id="type" name="type" class={field}>
+            {services.map((s) => <option>{s.title[lang]}</option>)}
+          </select>
+        </div>
+      </div>
+      <div><label for="message" class="mb-1.5 block text-sm font-medium">{_('contact.message')}</label><textarea id="message" name="message" rows="6" required class={field}></textarea></div>
+      <p id="form-error" class="hidden text-sm text-red-700" role="alert"></p>
+      <button type="submit" class="w-full rounded-lg bg-accent px-5 py-3.5 text-[15px] font-medium text-white hover:bg-accent-hover sm:w-auto">{_('contact.send')}</button>
+    </form>
+
+    <div class="space-y-3">
+      <p class="font-mono text-[13px] text-muted">{_('contact.or')}</p>
+      <a href={`mailto:${contact.email}`} class="flex flex-col rounded-xl border border-line p-5 hover:border-accent/50 hover:bg-side"><span class="font-mono text-xs text-muted">email</span><span class="font-medium break-all" dir="ltr">{contact.email}</span></a>
+      <a href={`https://wa.me/${contact.whatsapp}`} target="_blank" rel="noopener" class="flex flex-col rounded-xl border border-line p-5 hover:border-accent/50 hover:bg-side"><span class="font-mono text-xs text-muted">whatsapp</span><span class="font-medium" dir="ltr">{contact.phoneDisplay}</span></a>
+      <a href={contact.linkedin} target="_blank" rel="noopener" class="flex flex-col rounded-xl border border-line p-5 hover:border-accent/50 hover:bg-side"><span class="font-mono text-xs text-muted">linkedin</span><span class="font-medium">Mustafa El-Sherief</span></a>
+    </div>
+  </div>
+</Shell>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  const err = document.getElementById('form-error');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const d = new FormData(form);
+    const name = String(d.get('name') || '').trim();
+    const email = String(d.get('email') || '').trim();
+    const message = String(d.get('message') || '').trim();
+    if (!name || !email || !message || !email.includes('@')) {
+      if (err) { err.textContent = form.dataset.err || ''; err.classList.remove('hidden'); }
+      return;
+    }
+    err?.classList.add('hidden');
+    const company = String(d.get('company') || '').trim();
+    const type = String(d.get('type') || '');
+    const subject = `New project: ${type}${company ? ` — ${company}` : ''}`;
+    const body = `Name: ${name}\nEmail: ${email}\nCompany: ${company || '-'}\nType: ${type}\n\n${message}`;
+    window.location.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  });
+  form?.addEventListener('input', () => err?.classList.add('hidden'));
+</script>

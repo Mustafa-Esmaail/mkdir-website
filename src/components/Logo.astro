@@ -1,0 +1,10 @@
+---
+interface Props { size?: number; ink?: string; accent?: string }
+const { size = 28, ink = '#0F172A', accent = '#2563EB' } = Astro.props;
+---
+<svg viewBox="14 12 96 96" width={size} height={size} aria-hidden="true">
+  <g fill="none" stroke-width="10">
+    <path d="M25 60V25H50L58 33H74M92 51V95H52" stroke={ink} />
+    <path d="M80 33H104M92 21V45M22 70L33 81L22 92M36 95H46" stroke={accent} />
+  </g>
+</svg>
